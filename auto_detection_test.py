@@ -3,7 +3,7 @@ from inference.core.interfaces.stream.sinks import render_boxes
 
 ROBOFLOW_API_KEY = "c3P356etbTH7VIVpbpCk"
 MODEL_ID = "my-first-project-rj433/6"
-VIDEO_REFERENCE = 0
+VIDEO_REFERENCE = 1
 
 pipeline = InferencePipeline.init(
     model_id=MODEL_ID,
