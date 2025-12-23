@@ -1,3 +1,8 @@
+__name__ = "Racecount"
+__license__ = "GNUv3"
+__author__ = "Nikola Cajic, Theo Hubinger"
+__repository__ = "https://github.com/htl3r-2136/HTL3R_Racecount_4AX"
+
 import cv2
 import numpy as np
 import supervision as sv
