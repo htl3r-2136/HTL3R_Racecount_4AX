@@ -1,3 +1,15 @@
+"""
+Racecount - Video-basierte Rundenzählung für Slotcars.
+
+Dieses Skript verarbeitet eine Video-Datei, erkennt Fahrzeuge (Mercedes/Porsche)
+über ein Roboflow-Modell und zählt die Runden, sobald eine manuell definierte
+Ziellinie überquert wird.
+
+Features:
+- Manueller Ziellinien-Set per Mausklick.
+- Tracking via ByteTrack zur Vermeidung von Doppelzählungen.
+"""
+
 __name__ = "Racecount"
 __license__ = "GNUv3"
 __author__ = "Nikola Cajic, Theo Hubinger"
@@ -11,8 +23,8 @@ from inference.core.interfaces.camera.entities import VideoFrame
 
 # ================== CONFIG ==================
 ROBOFLOW_API_KEY = "c3P356etbTH7VIVpbpCk"
-MODEL_ID = "my-first-project-rj433/7"
-VIDEO_PATH = r"C:\Users\nikol\OneDrive\Desktop\Racecount_POR.mp4"  # <-- VIDEO DATEI
+MODEL_ID = "my-first-project-rj433/8"
+VIDEO_PATH = r"C:\Users\nikol\OneDrive\Desktop\Racecount_MER.mp4" # <-- VIDEO DATEI
 # ============================================
 
 # ================== STATE ==================
@@ -25,6 +37,7 @@ video_paused = True
 mercedes_laps = 0
 porsche_laps = 0
 # ============================================
+# Initialisierung der Supervision-Werkzeuge
 
 tracker = sv.ByteTrack()
 
@@ -38,6 +51,19 @@ line_annotator = sv.LineZoneAnnotator(
 
 # ================== MOUSE ==================
 def mouse_callback(event, x, y, flags, param):
+    """
+        Verarbeitet Mausereignisse zum Setzen der Ziellinie.
+
+        Zwei Linksklicks setzen Start- und Endpunkt. Sobald zwei Punkte vorhanden sind,
+        wird das Video automatisch gestartet.
+
+        Args:
+            event (int): OpenCV Ereignis-Typ (z.B. cv2.EVENT_LBUTTONDOWN).
+            x (int): X-Koordinate des Klicks.
+            y (int): Y-Koordinate des Klicks.
+            flags (int): Event-spezifische Flags.
+            param: Optionale Parameter.
+    """
     global line_points, line_ready, video_paused
 
     if event == cv2.EVENT_LBUTTONDOWN and not line_ready:
@@ -52,6 +78,18 @@ def mouse_callback(event, x, y, flags, param):
 
 # ================== PIPELINE CALLBACK ==================
 def on_prediction(predictions, video_frame: VideoFrame):
+    """
+        Haupt-Callback für die Inference Pipeline. Verarbeitet Detektionen und UI.
+
+        Diese Funktion übernimmt das Key-Handling (Pause/Quit), die Konvertierung
+        der Detektionen, das Tracking sowie die Logik der Rundenzählung.
+
+
+
+        Args:
+            predictions (dict): Rohdaten der Objekterkennung von Roboflow.
+            video_frame (VideoFrame): Das aktuelle Bild-Frame inklusive Metadaten.
+    """
     global line_zone, mercedes_laps, porsche_laps, video_paused
 
     frame = video_frame.image
@@ -151,24 +189,23 @@ def on_prediction(predictions, video_frame: VideoFrame):
         annotated,
         f"Mercedes: {mercedes_laps}",
         (10, 30),
-        cv2.FONT_HERSHEY_DUPLEX,
-        1.5,
+        cv2.FONT_HERSHEY_SIMPLEX,
+        0.7,
         (0, 255, 0),
-        1
+        2
     )
     cv2.putText(
         annotated,
         f"Porsche: {porsche_laps}",
         (10, 60),
-        cv2.FONT_HERSHEY_DUPLEX,
-        1.5,
+        cv2.FONT_HERSHEY_SIMPLEX,
+        0.7,
         (0, 255, 0),
-        1
+        2
     )
 
     cv2.imshow("RaceCount", annotated)
 # =======================================================
-
 # ================== WINDOW ==================
 cv2.namedWindow("RaceCount", cv2.WINDOW_NORMAL)
 cv2.resizeWindow("RaceCount", 1280, 720)

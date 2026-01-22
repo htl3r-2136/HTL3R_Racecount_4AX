@@ -29,7 +29,8 @@ line_zone = None
 
 mercedes_laps = 0
 porsche_laps = 0
-
+# ============================================
+# Initialisierung der Supervision-Werkzeuge
 tracker = sv.ByteTrack()
 
 box_annotator = sv.RoundBoxAnnotator()
